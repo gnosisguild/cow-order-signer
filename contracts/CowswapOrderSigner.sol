@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// OrderApprover contract taken from https://gist.github.com/Arachnid/6950b3367258b5d5033f6e1c411086e8
+// contract taken from https://gist.github.com/Arachnid/6950b3367258b5d5033f6e1c411086e8
 // cowswap contracts taken from https://github.com/cowprotocol/contracts/releases/tag/v1.3.2
 
 pragma solidity ^0.8.12;
@@ -9,7 +9,7 @@ import "./cowProtocol/libraries/GPv2Order.sol";
 import "./cowProtocol/mixins/GPv2Signing.sol";
 import "./cowProtocol/interfaces/IERC20.sol";
 
-contract CowswapOrderApprover {
+contract CowswapOrderSigner {
     using GPv2Order for GPv2Order.Data;
 
     GPv2Signing public immutable signing;
@@ -22,7 +22,7 @@ contract CowswapOrderApprover {
         deployedAt = address(this);
     }
 
-    function approveOrder(
+    function signOrder(
         IERC20 sellToken,
         IERC20 buyToken,
         uint256 sellAmount,

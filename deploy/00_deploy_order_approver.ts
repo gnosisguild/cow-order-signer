@@ -18,11 +18,11 @@ const deployOrderApprover: DeployFunction = async ({
     GPv2SigningAddress = GPv2SigningContract.address;
   }
 
-  const OrderApprover = await ethers.getContractFactory("CowswapOrderApprover");
-  const orderApproverContract = await OrderApprover.deploy(GPv2SigningAddress);
-  await orderApproverContract.deployed();
+  const OrderSigner = await ethers.getContractFactory("CowswapOrderSigner");
+  const orderSignerContract = await OrderSigner.deploy(GPv2SigningAddress);
+  await orderSignerContract.deployed();
 
-  console.log("OrderApprover address:", orderApproverContract.address);
+  console.log("OrderApprover address:", orderSignerContract.address);
 };
 
 export default deployOrderApprover;
