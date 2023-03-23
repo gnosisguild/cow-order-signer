@@ -32,7 +32,10 @@ export default {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      chainId: 31337, // This is the value used in the @gnosis.pm/zodiac package (important for looking up the ModuleProxyFactory address)
+      forking: {
+        url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+        blockNumber: 16883800,
+      },
     },
     mainnet: {
       ...sharedNetworkConfig,
