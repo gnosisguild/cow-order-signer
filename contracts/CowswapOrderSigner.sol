@@ -22,6 +22,44 @@ contract CowswapOrderSigner {
         deployedAt = address(this);
     }
 
+    // write an internal function that creates the order digest
+    function packOrder(
+        IERC20 sellToken,
+        IERC20 buyToken,
+        uint256 sellAmount,
+        uint256 buyAmount,
+        uint32 validTo,
+        uint256 feeAmount,
+        bytes32 kind,
+        bool partiallyFillable,
+        bytes32 sellTokenBalance,
+        bytes32 buyTokenBalance
+    ) internal view returns (bytes memory) {
+        GPv2Order.Data memory order;
+        order.sellToken = sellToken;
+        order.buyToken = buyToken;
+        order.receiver = address(this);
+        order.sellAmount = sellAmount;
+        order.buyAmount = buyAmount;
+        order.validTo = validTo;
+        order.appData = bytes32(uint256(uint160(deployedAt)));
+        order.feeAmount = feeAmount;
+        order.kind = kind;
+        order.partiallyFillable = partiallyFillable;
+        order.sellTokenBalance = sellTokenBalance;
+        order.buyTokenBalance = buyTokenBalance;
+
+        bytes32 orderDigest = order.hash(domainSeparator);
+        bytes memory orderUid = new bytes(GPv2Order.UID_LENGTH);
+        GPv2Order.packOrderUidParams(
+            orderUid,
+            orderDigest,
+            address(this),
+            validTo);
+
+        return orderUid;
+    }
+
     function signOrder(
         IERC20 sellToken,
         IERC20 buyToken,
@@ -36,27 +74,7 @@ contract CowswapOrderSigner {
     ) external {
         require(address(this) != deployedAt, "DELEGATECALL only");
 
-        GPv2Order.Data memory order;
-        order.sellToken = sellToken;
-        order.buyToken = buyToken;
-        order.receiver = address(this);
-        order.sellAmount = sellAmount;
-        order.buyAmount = buyAmount;
-        order.validTo = validTo;
-        order.appData = bytes32(uint256(uint160(deployedAt)));
-        order.feeAmount = (sellAmount * feeAmountBP) / 10000;
-        order.kind = kind;
-        order.partiallyFillable = partiallyFillable;
-        order.sellTokenBalance = sellTokenBalance;
-        order.buyTokenBalance = buyTokenBalance;
-
-        bytes32 orderDigest = order.hash(domainSeparator);
-        bytes memory orderUid = new bytes(GPv2Order.UID_LENGTH);
-        GPv2Order.packOrderUidParams(
-            orderUid,
-            orderDigest,
-            address(this),
-            order.validTo);
+        bytes memory orderUid = packOrder(sellToken, buyToken, sellAmount, buyAmount, validTo, feeAmountBP, kind, partiallyFillable, sellTokenBalance, buyTokenBalance);
         signing.setPreSignature(orderUid, true);
     }
 }
