@@ -53,24 +53,38 @@ describe("CowswapOrderSigner contract", () => {
         sellAmount: BigNumber.from("96825924243465932"),
         buyAmount: BigNumber.from("474505929366652675891"),
         validTo: 1679356004,
-        feeAmount: 5174075756534068,
+        feeAmountBP: Math.floor((5174075756534068 / 96825924243465932) * 10000), // = 534
         kind: ethers.utils.id("sell"),
         partiallyFillable: false,
         sellTokenBalance: ethers.utils.id("erc20"),
         buyTokenBalance: ethers.utils.id("erc20"),
       };
 
-      console.log(order);
+      const GPv2Order = {
+        ...order,
+        feeAmount: order.sellAmount.mul(534).div(10000),
+      };
 
-      const expectedUid =
-        "0x77030f2168e39a37d4206871bfb61a191ad6f1047c38b1d7a9149d8e005d4e99fc9e76701494af20018323dbbb3dcfd069089e6b6418f064";
+      const expectedUid = await packOrder.GPv2PackOrder(
+        GPv2Order.sellToken,
+        GPv2Order.buyToken,
+        GPv2Order.sellAmount,
+        GPv2Order.buyAmount,
+        GPv2Order.validTo,
+        GPv2Order.feeAmount,
+        GPv2Order.kind,
+        GPv2Order.partiallyFillable,
+        GPv2Order.sellTokenBalance,
+        GPv2Order.buyTokenBalance
+      );
+
       const uid = await packOrder.publicPackOrder(
         order.sellToken,
         order.buyToken,
         order.sellAmount,
         order.buyAmount,
         order.validTo,
-        order.feeAmount,
+        order.feeAmountBP,
         order.kind,
         order.partiallyFillable,
         order.sellTokenBalance,
