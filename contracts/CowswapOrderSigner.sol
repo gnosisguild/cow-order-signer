@@ -29,7 +29,7 @@ contract CowswapOrderSigner {
         uint256 sellAmount,
         uint256 buyAmount,
         uint32 validTo,
-        uint256 feeAmount,
+        uint256 feeAmountBP,
         bytes32 kind,
         bool partiallyFillable,
         bytes32 sellTokenBalance,
@@ -43,7 +43,7 @@ contract CowswapOrderSigner {
         order.buyAmount = buyAmount;
         order.validTo = validTo;
         order.appData = bytes32(uint256(uint160(deployedAt)));
-        order.feeAmount = feeAmount;
+        order.feeAmount = (sellAmount * feeAmountBP) / 10000;
         order.kind = kind;
         order.partiallyFillable = partiallyFillable;
         order.sellTokenBalance = sellTokenBalance;
