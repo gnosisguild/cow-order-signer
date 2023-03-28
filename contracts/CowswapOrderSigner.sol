@@ -67,6 +67,7 @@ contract CowswapOrderSigner {
         uint256 buyAmount,
         uint32 validTo, // unix timestamp
         uint32 validDuration, // seconds
+        uint256 feeAmount,
         uint256 feeAmountBP,
         bytes32 kind,
         bool partiallyFillable,
@@ -75,6 +76,7 @@ contract CowswapOrderSigner {
     ) external {
         require(address(this) != deployedAt, "DELEGATECALL only");
         require(block.timestamp + validDuration < validTo, "Order expired");
+        require(feeAmount <= (sellAmount * feeAmountBP) / 10000 + 1, "Fee too high");
 
         bytes memory orderUid = packOrder(sellToken, buyToken, sellAmount, buyAmount, validTo, feeAmountBP, kind, partiallyFillable, sellTokenBalance, buyTokenBalance);
         signing.setPreSignature(orderUid, true);
