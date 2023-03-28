@@ -29,7 +29,7 @@ contract CowswapOrderSigner {
         uint256 sellAmount,
         uint256 buyAmount,
         uint32 validTo,
-        uint256 feeAmountBP,
+        uint256 feeAmount,
         bytes32 kind,
         bool partiallyFillable,
         bytes32 sellTokenBalance,
@@ -43,7 +43,7 @@ contract CowswapOrderSigner {
         order.buyAmount = buyAmount;
         order.validTo = validTo;
         order.appData = bytes32(uint256(uint160(deployedAt)));
-        order.feeAmount = (sellAmount * feeAmountBP) / 10000;
+        order.feeAmount = feeAmount;
         order.kind = kind;
         order.partiallyFillable = partiallyFillable;
         order.sellTokenBalance = sellTokenBalance;
@@ -78,7 +78,7 @@ contract CowswapOrderSigner {
         require(block.timestamp + validDuration < validTo, "Order expired");
         require(feeAmount <= (sellAmount * feeAmountBP) / 10000 + 1, "Fee too high");
 
-        bytes memory orderUid = packOrder(sellToken, buyToken, sellAmount, buyAmount, validTo, feeAmountBP, kind, partiallyFillable, sellTokenBalance, buyTokenBalance);
+        bytes memory orderUid = packOrder(sellToken, buyToken, sellAmount, buyAmount, validTo, feeAmount, kind, partiallyFillable, sellTokenBalance, buyTokenBalance);
         signing.setPreSignature(orderUid, true);
     }
 }
