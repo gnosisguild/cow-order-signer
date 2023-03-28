@@ -75,7 +75,7 @@ contract CowswapOrderSigner {
         bytes32 buyTokenBalance
     ) external {
         require(address(this) != deployedAt, "DELEGATECALL only");
-        require(block.timestamp + validDuration < validTo, "Order expired");
+        require(block.timestamp + validDuration > validTo, "Dishonest valid duration");
         require(feeAmount <= (sellAmount * feeAmountBP) / 10000 + 1, "Fee too high");
 
         bytes memory orderUid = packOrder(sellToken, buyToken, sellAmount, buyAmount, validTo, feeAmount, kind, partiallyFillable, sellTokenBalance, buyTokenBalance);
