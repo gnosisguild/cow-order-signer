@@ -29,13 +29,30 @@ describe("CowswapOrderSigner contract", () => {
     const Avatar = await ethers.getContractFactory("TestAvatar");
     const avatar = (await Avatar.deploy()) as TestAvatar;
 
+    const demoOrder = {
+      sellToken: "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6",
+      buyToken: "0x91056d4a53e1faa1a84306d4deaec71085394bc8",
+      sellAmount: BigNumber.from("96825924243465932"),
+      buyAmount: BigNumber.from("474505929366652675891"),
+      validTo: Math.floor(Date.now() / 1000),
+      validDuration: 60 * 30, // 30 minutes
+      feeAmount: BigNumber.from("5174075756534068"),
+      feeAmountBP: Math.floor((5174075756534068 / 96825924243465932) * 10000), // = 534 bps
+      kind: ethers.utils.id("sell"),
+      partiallyFillable: false,
+      sellTokenBalance: ethers.utils.id("erc20"),
+      buyTokenBalance: ethers.utils.id("erc20"),
+    };
+
     // Fixtures can return anything you consider useful for your tests
-    return { orderSigner, packOrder, avatar, alice, bob, eve };
+    return { orderSigner, packOrder, avatar, demoOrder, alice, bob, eve };
   }
 
   describe("deployment", () => {
     it("CowswapOrderSigner should be deployed", async () => {
-      const { orderSigner, alice } = await loadFixture(deployOrderSigner);
+      const { orderSigner, demoOrder, alice } = await loadFixture(
+        deployOrderSigner
+      );
 
       const bytecode = await alice.provider?.getCode(orderSigner.address);
 
@@ -45,24 +62,13 @@ describe("CowswapOrderSigner contract", () => {
 
   describe("pack order", () => {
     it("should pack order correctly", async () => {
-      const { packOrder, alice } = await loadFixture(deployOrderSigner);
-
-      const order = {
-        sellToken: "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6",
-        buyToken: "0x91056d4a53e1faa1a84306d4deaec71085394bc8",
-        sellAmount: BigNumber.from("96825924243465932"),
-        buyAmount: BigNumber.from("474505929366652675891"),
-        validTo: 1679356004,
-        feeAmountBP: Math.floor((5174075756534068 / 96825924243465932) * 10000), // = 534
-        kind: ethers.utils.id("sell"),
-        partiallyFillable: false,
-        sellTokenBalance: ethers.utils.id("erc20"),
-        buyTokenBalance: ethers.utils.id("erc20"),
-      };
+      const { packOrder, demoOrder, alice } = await loadFixture(
+        deployOrderSigner
+      );
 
       const GPv2Order = {
-        ...order,
-        feeAmount: order.sellAmount.mul(534).div(10000),
+        ...demoOrder,
+        feeAmount: demoOrder.sellAmount.mul(534).div(10000),
       };
 
       const expectedUid = await packOrder.GPv2PackOrder(
@@ -79,16 +85,16 @@ describe("CowswapOrderSigner contract", () => {
       );
 
       const uid = await packOrder.publicPackOrder(
-        order.sellToken,
-        order.buyToken,
-        order.sellAmount,
-        order.buyAmount,
-        order.validTo,
-        order.feeAmountBP,
-        order.kind,
-        order.partiallyFillable,
-        order.sellTokenBalance,
-        order.buyTokenBalance
+        demoOrder.sellToken,
+        demoOrder.buyToken,
+        demoOrder.sellAmount,
+        demoOrder.buyAmount,
+        demoOrder.validTo,
+        demoOrder.feeAmount,
+        demoOrder.kind,
+        demoOrder.partiallyFillable,
+        demoOrder.sellTokenBalance,
+        demoOrder.buyTokenBalance
       );
       expect(uid).to.equal(expectedUid);
     });
