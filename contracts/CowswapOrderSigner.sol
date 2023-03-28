@@ -65,7 +65,8 @@ contract CowswapOrderSigner {
         IERC20 buyToken,
         uint256 sellAmount,
         uint256 buyAmount,
-        uint32 validTo,
+        uint32 validTo, // unix timestamp
+        uint32 validDuration, // seconds
         uint256 feeAmountBP,
         bytes32 kind,
         bool partiallyFillable,
@@ -73,6 +74,7 @@ contract CowswapOrderSigner {
         bytes32 buyTokenBalance
     ) external {
         require(address(this) != deployedAt, "DELEGATECALL only");
+        require(block.timestamp + validDuration < validTo, "Order expired");
 
         bytes memory orderUid = packOrder(sellToken, buyToken, sellAmount, buyAmount, validTo, feeAmountBP, kind, partiallyFillable, sellTokenBalance, buyTokenBalance);
         signing.setPreSignature(orderUid, true);
