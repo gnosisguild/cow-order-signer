@@ -68,7 +68,7 @@ describe("CowswapOrderSigner contract", () => {
 
       const GPv2Order = {
         ...demoOrder,
-        feeAmount: demoOrder.sellAmount.mul(534).div(10000),
+        feeAmount: demoOrder.feeAmount,
       };
 
       const expectedUid = await packOrder.GPv2PackOrder(
@@ -100,27 +100,35 @@ describe("CowswapOrderSigner contract", () => {
     });
   });
 
-  // describe("presigning", () => {
-  //   it("should allow presigning with a delegateCall", async () => {
-  //     const { orderSigner, avatar } = await loadFixture(deployOrderSigner);
+  describe("DelegateCall", () => {
+    it("should allow signing with a delegateCall", async () => {
+      const { orderSigner, avatar, demoOrder } = await loadFixture(
+        deployOrderSigner
+      );
 
-  //     const order = {
-  //       sellToken: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
-  //       buyToken: 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
-  //       sellAmount: 10000000000,
-  //       buyAmount: 4959721654652700610,
-  //       validTo: 1628035200,
-  //       appData: 0xf785fae7a7c5abc49f3cd6a61f6df1ff26433392b066ee9ff2240ff1eb7ab6e4,
-  //       feeAmount: 14075734,
-  //       kind: "sell",
-  //       partiallyFillable: false,
-  //       receiver: ethers.constants.AddressZero,
-  //     };
+      const abi = new ethers.utils.Interface([
+        "function signOrder(address,address,uint256,uint256,uint32,uint32,uint256,uint256,bytes32,bool,bytes32,bytes32) external",
+      ]);
 
-  //     await expect(avatar.exec(orderSigner.address, 0, [], 1)).to.not.be
-  //       .reverted;
+      const callData = abi.encodeFunctionData("signOrder", [
+        demoOrder.sellToken,
+        demoOrder.buyToken,
+        demoOrder.sellAmount,
+        demoOrder.buyAmount,
+        demoOrder.validTo,
+        demoOrder.validDuration,
+        demoOrder.feeAmount,
+        demoOrder.feeAmountBP,
+        demoOrder.kind,
+        demoOrder.partiallyFillable,
+        demoOrder.sellTokenBalance,
+        demoOrder.buyTokenBalance,
+      ]);
 
-  //     console.log(avatar.address);
-  //   });
-  // });
+      await avatar.exec(orderSigner.address, 0, callData, 1);
+
+      // await expect(avatar.exec(orderSigner.address, 0, callData, 1)).to.not.be
+      //   .reverted;
+    });
+  });
 });

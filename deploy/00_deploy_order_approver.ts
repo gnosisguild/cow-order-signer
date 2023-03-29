@@ -24,6 +24,7 @@ const deployOrderSigner: DeployFunction = async ({
     defaultSalt,
     keccak256(OrderSigner.bytecode + initData.slice(2))
   );
+
   console.log("expected adress", orderSignerAddress);
   await deployMastercopyWithInitData(
     deployer,
