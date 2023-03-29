@@ -106,11 +106,7 @@ describe("CowswapOrderSigner contract", () => {
         deployOrderSigner
       );
 
-      const abi = new ethers.utils.Interface([
-        "function signOrder(address,address,uint256,uint256,uint32,uint32,uint256,uint256,bytes32,bool,bytes32,bytes32) external",
-      ]);
-
-      const callData = abi.encodeFunctionData("signOrder", [
+      const { data } = await orderSigner.populateTransaction.signOrder(
         demoOrder.sellToken,
         demoOrder.buyToken,
         demoOrder.sellAmount,
@@ -122,10 +118,10 @@ describe("CowswapOrderSigner contract", () => {
         demoOrder.kind,
         demoOrder.partiallyFillable,
         demoOrder.sellTokenBalance,
-        demoOrder.buyTokenBalance,
-      ]);
+        demoOrder.buyTokenBalance
+      );
 
-      await avatar.exec(orderSigner.address, 0, callData, 1);
+      await avatar.exec(orderSigner.address, 0, data || "", 1);
 
       // await expect(avatar.exec(orderSigner.address, 0, callData, 1)).to.not.be
       //   .reverted;
