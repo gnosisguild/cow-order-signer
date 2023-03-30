@@ -127,4 +127,58 @@ describe("CowswapOrderSigner contract", () => {
         .reverted;
     });
   });
+
+  describe("Bad Orders", () => {
+    it("Order with fee BP lower than fee amount should revert", async () => {
+      const { orderSigner, avatar, demoOrder } = await loadFixture(
+        deployOrderSigner
+      );
+
+      demoOrder.feeAmountBP = 100; // was 535
+
+      const { data } = await orderSigner.populateTransaction.signOrder(
+        demoOrder.sellToken,
+        demoOrder.buyToken,
+        demoOrder.sellAmount,
+        demoOrder.buyAmount,
+        demoOrder.validTo,
+        demoOrder.validDuration,
+        demoOrder.feeAmount,
+        demoOrder.feeAmountBP,
+        demoOrder.kind,
+        demoOrder.partiallyFillable,
+        demoOrder.sellTokenBalance,
+        demoOrder.buyTokenBalance
+      );
+
+      await expect(avatar.exec(orderSigner.address, 0, data || "", 1)).to.be
+        .reverted;
+    });
+
+    it("Order with a validTo outside validDuration should revert", async () => {
+      const { orderSigner, avatar, demoOrder } = await loadFixture(
+        deployOrderSigner
+      );
+
+      demoOrder.validTo = demoOrder.validTo + demoOrder.validDuration + 60;
+
+      const { data } = await orderSigner.populateTransaction.signOrder(
+        demoOrder.sellToken,
+        demoOrder.buyToken,
+        demoOrder.sellAmount,
+        demoOrder.buyAmount,
+        demoOrder.validTo,
+        demoOrder.validDuration,
+        demoOrder.feeAmount,
+        demoOrder.feeAmountBP,
+        demoOrder.kind,
+        demoOrder.partiallyFillable,
+        demoOrder.sellTokenBalance,
+        demoOrder.buyTokenBalance
+      );
+
+      await expect(avatar.exec(orderSigner.address, 0, data || "", 1)).to.be
+        .reverted;
+    });
+  });
 });
