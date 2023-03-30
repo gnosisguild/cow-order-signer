@@ -1,5 +1,5 @@
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 
@@ -29,15 +29,17 @@ describe("CowswapOrderSigner contract", () => {
     const Avatar = await ethers.getContractFactory("TestAvatar");
     const avatar = (await Avatar.deploy()) as TestAvatar;
 
+    const timestamp = await time.latest();
+
     const demoOrder = {
       sellToken: "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6",
       buyToken: "0x91056d4a53e1faa1a84306d4deaec71085394bc8",
       sellAmount: BigNumber.from("96825924243465932"),
       buyAmount: BigNumber.from("474505929366652675891"),
-      validTo: Math.floor(Date.now() / 1000),
+      validTo: timestamp,
       validDuration: 60 * 30, // 30 minutes
       feeAmount: BigNumber.from("5174075756534068"),
-      feeAmountBP: Math.floor((5174075756534068 / 96825924243465932) * 10000), // = 534 bps
+      feeAmountBP: Math.ceil((5174075756534068 / 96825924243465932) * 10000), // = 535 bps
       kind: ethers.utils.id("sell"),
       partiallyFillable: false,
       sellTokenBalance: ethers.utils.id("erc20"),
@@ -121,10 +123,8 @@ describe("CowswapOrderSigner contract", () => {
         demoOrder.buyTokenBalance
       );
 
-      await avatar.exec(orderSigner.address, 0, data || "", 1);
-
-      // await expect(avatar.exec(orderSigner.address, 0, callData, 1)).to.not.be
-      //   .reverted;
+      await expect(avatar.exec(orderSigner.address, 0, data || "", 1)).to.not.be
+        .reverted;
     });
   });
 });
