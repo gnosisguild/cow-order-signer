@@ -10,6 +10,8 @@ const deployOrderSigner: DeployFunction = async ({
 }) => {
   const { deploy, getNetworkName } = deployments;
   const [signer] = await ethers.getSigners();
+  console.log("deploying using account", signer.address);
+
   const deployer = ethers.provider.getSigner(signer.address);
   let GPv2SigningAddress = "0x9008D19f58AAbD9eD0D60971565AA8510560ab41";
 
