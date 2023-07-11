@@ -1,7 +1,15 @@
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { DeployFunction } from "hardhat-deploy/types";
 import { deployMastercopyWithInitData } from "@gnosis.pm/zodiac";
-import { getCreate2Address, keccak256 } from "ethers/lib/utils";
+import {
+  formatEther,
+  formatUnits,
+  getCreate2Address,
+  keccak256,
+  parseUnits,
+} from "ethers/lib/utils";
+import { getSingletonFactory } from "@gnosis.pm/zodiac/dist/src/factory/singletonFactory";
+import { BigNumber } from "ethers";
 
 const deployOrderSigner: DeployFunction = async ({
   ethers,
@@ -27,12 +35,30 @@ const deployOrderSigner: DeployFunction = async ({
     keccak256(OrderSigner.bytecode + initData.slice(2))
   );
 
-  console.log("expected adress", orderSignerAddress);
-  await deployMastercopyWithInitData(
-    deployer,
-    OrderSigner.bytecode + initData.slice(2),
-    defaultSalt
+  console.log("expected address", orderSignerAddress);
+
+  const singletonFactory = await getSingletonFactory(deployer);
+
+  const gasPrice = await signer.getGasPrice();
+  console.log(
+    "account needs ETH (not all will be spent)",
+    formatEther(BigNumber.from("450000").mul(gasPrice)),
+    "at gas price: " + formatUnits(gasPrice, "gwei") + " gwei"
   );
+
+  await singletonFactory.deploy(
+    OrderSigner.bytecode + initData.slice(2),
+    defaultSalt,
+    { gasLimit: BigNumber.from("450000") }
+  );
+
+  if ((await signer.provider.getCode(orderSignerAddress)).length > 2) {
+    console.log(
+      `  \x1B[32m✔ Mastercopy deployed to:        ${orderSignerAddress} 🎉\x1B[0m `
+    );
+  } else {
+    console.log("  \x1B[31m✘ Deployment failed.\x1B[0m");
+  }
 };
 
 export default deployOrderSigner;
