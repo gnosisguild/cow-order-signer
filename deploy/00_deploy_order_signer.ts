@@ -1,6 +1,5 @@
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { DeployFunction } from "hardhat-deploy/types";
-import { deployMastercopyWithInitData } from "@gnosis.pm/zodiac";
 import {
   formatEther,
   formatUnits,
@@ -46,19 +45,22 @@ const deployOrderSigner: DeployFunction = async ({
     "at gas price: " + formatUnits(gasPrice, "gwei") + " gwei"
   );
 
+  if ((await signer.provider.getCode(orderSignerAddress)).length > 2) {
+    console.log(
+      `  \x1B[32m✔ Already deployed at:        ${orderSignerAddress}\x1B[0m `
+    );
+    return;
+  }
+
   await singletonFactory.deploy(
     OrderSigner.bytecode + initData.slice(2),
     defaultSalt,
     { gasLimit: BigNumber.from("450000") }
   );
 
-  if ((await signer.provider.getCode(orderSignerAddress)).length > 2) {
-    console.log(
-      `  \x1B[32m✔ Mastercopy deployed to:        ${orderSignerAddress} 🎉\x1B[0m `
-    );
-  } else {
-    console.log("  \x1B[31m✘ Deployment failed.\x1B[0m");
-  }
+  console.log(
+    `  \x1B[32m✔ Mastercopy deployed to:        ${orderSignerAddress} 🎉\x1B[0m `
+  );
 };
 
 export default deployOrderSigner;
