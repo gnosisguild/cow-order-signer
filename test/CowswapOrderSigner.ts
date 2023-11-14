@@ -17,7 +17,7 @@ import {
   GPv2Signing,
   GPv2Signing__factory,
 } from "../typechain-types";
-import { keccak256, solidityKeccak256 } from "ethers/lib/utils";
+import { solidityKeccak256 } from "ethers/lib/utils";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { BigNumber, Contract } from "ethers";
 
