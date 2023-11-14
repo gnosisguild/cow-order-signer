@@ -64,7 +64,7 @@ describe("CowswapOrderSigner contract", () => {
       buyAmount: "474505929366652675891",
       validTo: now + 60 * 30,
       appData: solidityKeccak256(["string"], [appData]),
-      feeAmount: "5174075756534068",
+      feeAmount: "19174075756534068",
       kind: ethers.utils.id("sell"),
       partiallyFillable: false,
       sellTokenBalance: ethers.utils.id("erc20"),
@@ -111,17 +111,22 @@ describe("CowswapOrderSigner contract", () => {
 
       const cowApi = new OrderBookApi({ chainId: 1 });
 
-      const expectedUid = await cowApi.sendOrder({
-        ...demoOrder,
-        kind: OrderKind.SELL,
-        sellTokenBalance: SellTokenSource.ERC20,
-        buyTokenBalance: BuyTokenDestination.ERC20,
-        from: avatar.address,
-        appData: appData,
-        appDataHash: demoOrder.appData,
-        signingScheme: SigningScheme.PRESIGN,
-        signature: "0x", // must be empty for presign
-      });
+      const expectedUid = await cowApi
+        .sendOrder({
+          ...demoOrder,
+          kind: OrderKind.SELL,
+          sellTokenBalance: SellTokenSource.ERC20,
+          buyTokenBalance: BuyTokenDestination.ERC20,
+          from: avatar.address,
+          appData: appData,
+          appDataHash: demoOrder.appData,
+          signingScheme: SigningScheme.PRESIGN,
+          signature: "0x", // must be empty for presign
+        })
+        .catch((e) => {
+          console.error(e);
+          throw e;
+        });
 
       // order UID is not yet signed
       expect(await cowswap.preSignature(expectedUid)).to.equal(0);
@@ -210,17 +215,22 @@ describe("CowswapOrderSigner contract", () => {
       // It's not possible to send multiple orders with the same UID, so we need to modify the order
       const demoOrder2 = { ...demoOrder, validTo: demoOrder.validTo + 1 };
 
-      const expectedUid = await cowApi.sendOrder({
-        ...demoOrder2,
-        kind: OrderKind.SELL,
-        sellTokenBalance: SellTokenSource.ERC20,
-        buyTokenBalance: BuyTokenDestination.ERC20,
-        from: avatar.address,
-        appData: appData,
-        appDataHash: demoOrder2.appData,
-        signingScheme: SigningScheme.PRESIGN,
-        signature: "0x", // must be empty for presign
-      });
+      const expectedUid = await cowApi
+        .sendOrder({
+          ...demoOrder2,
+          kind: OrderKind.SELL,
+          sellTokenBalance: SellTokenSource.ERC20,
+          buyTokenBalance: BuyTokenDestination.ERC20,
+          from: avatar.address,
+          appData: appData,
+          appDataHash: demoOrder2.appData,
+          signingScheme: SigningScheme.PRESIGN,
+          signature: "0x", // must be empty for presign
+        })
+        .catch((e) => {
+          console.error(e);
+          throw e;
+        });
 
       // sign the order
       const { data: signData } =
