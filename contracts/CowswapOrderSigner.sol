@@ -24,7 +24,7 @@ contract CowswapOrderSigner {
         deployedAt = address(this);
     }
 
-    function _setPresignature(
+    function _setPreSignature(
         GPv2Order.Data calldata order,
         bool signed
     ) internal {
@@ -52,10 +52,10 @@ contract CowswapOrderSigner {
             "Fee too high"
         );
 
-        _setPresignature(order, true);
+        _setPreSignature(order, true);
     }
 
     function unsignOrder(GPv2Order.Data calldata order) external {
-        _setPresignature(order, false);
+        _setPreSignature(order, false);
     }
 }
