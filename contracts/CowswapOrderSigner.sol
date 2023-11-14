@@ -11,6 +11,7 @@ import "./cowProtocol/interfaces/IERC20.sol";
 
 contract CowswapOrderSigner {
     using GPv2Order for GPv2Order.Data;
+    using GPv2Order for bytes;
 
     GPv2Signing public immutable signing;
     bytes32 public immutable domainSeparator;
@@ -32,12 +33,7 @@ contract CowswapOrderSigner {
         // compute order UID
         bytes32 orderDigest = order.hash(domainSeparator);
         bytes memory orderUid = new bytes(GPv2Order.UID_LENGTH);
-        GPv2Order.packOrderUidParams(
-            orderUid,
-            orderDigest,
-            address(this),
-            order.validTo
-        );
+        orderUid.packOrderUidParams(orderDigest, address(this), order.validTo);
 
         signing.setPreSignature(orderUid, signed);
     }
