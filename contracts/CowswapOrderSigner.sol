@@ -17,6 +17,7 @@ contract CowswapOrderSigner {
     address public immutable deployedAt;
 
     constructor(GPv2Signing _signing) {
+        require(address(_signing) != address(0), "Invalid signing address");
         signing = _signing;
         domainSeparator = _signing.domainSeparator();
         deployedAt = address(this);
