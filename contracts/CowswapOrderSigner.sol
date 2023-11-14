@@ -13,8 +13,8 @@ contract CowswapOrderSigner {
     using GPv2Order for GPv2Order.Data;
 
     GPv2Signing public immutable signing;
-    bytes32 immutable domainSeparator;
-    address immutable deployedAt;
+    bytes32 public immutable domainSeparator;
+    address public immutable deployedAt;
 
     constructor(GPv2Signing _signing) {
         signing = _signing;
