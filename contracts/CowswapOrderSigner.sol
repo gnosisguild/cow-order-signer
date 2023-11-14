@@ -23,20 +23,11 @@ contract CowswapOrderSigner {
         deployedAt = address(this);
     }
 
-    function signOrder(
+    function _setPresignature(
         GPv2Order.Data calldata order,
-        uint32 validDuration, // seconds
-        uint256 feeAmountBP // basis points
-    ) external {
+        bool signed
+    ) internal {
         require(address(this) != deployedAt, "DELEGATECALL only");
-        require(
-            block.timestamp + validDuration > order.validTo,
-            "Dishonest valid duration"
-        );
-        require(
-            order.feeAmount <= (order.sellAmount * feeAmountBP) / 10_000 + 1,
-            "Fee too high"
-        );
 
         // compute order UID
         bytes32 orderDigest = order.hash(domainSeparator);
@@ -48,6 +39,27 @@ contract CowswapOrderSigner {
             order.validTo
         );
 
-        signing.setPreSignature(orderUid, true);
+        signing.setPreSignature(orderUid, signed);
+    }
+
+    function signOrder(
+        GPv2Order.Data calldata order,
+        uint32 validDuration, // seconds
+        uint256 feeAmountBP // basis points
+    ) external {
+        require(
+            block.timestamp + validDuration > order.validTo,
+            "Dishonest valid duration"
+        );
+        require(
+            order.feeAmount <= (order.sellAmount * feeAmountBP) / 10_000 + 1,
+            "Fee too high"
+        );
+
+        _setPresignature(order, true);
+    }
+
+    function unsignOrder(GPv2Order.Data calldata order) external {
+        _setPresignature(order, false);
     }
 }
