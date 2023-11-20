@@ -48,7 +48,7 @@ contract CowswapOrderSigner {
             "Dishonest valid duration"
         );
         require(
-            order.feeAmount <= (order.sellAmount * feeAmountBP) / 10_000 + 1,
+            order.feeAmount <= (order.sellAmount * feeAmountBP) / 100_00 + 1,
             "Fee too high"
         );
 
