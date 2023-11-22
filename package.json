@@ -1,6 +1,6 @@
 {
-  "name": "cow-order-wrapper",
-  "version": "1.0.0",
+  "name": "cow-order-signer",
+  "version": "2.0.0",
   "description": "",
   "scripts": {
     "build": "hardhat compile",
@@ -10,15 +10,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gnosis/cow-order-wrapper.git"
+    "url": "git+https://github.com/gnosis/cow-order-signer.git"
   },
   "author": "Gnosis Guild",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gnosis/cow-order-wrapper/issues"
+    "url": "https://github.com/gnosis/cow-order-signer/issues"
   },
-  "homepage": "https://github.com/gnosis/cow-order-wrapper#readme",
+  "homepage": "https://github.com/gnosis/cow-order-signer#readme",
   "devDependencies": {
+    "@cowprotocol/cow-sdk": "^4.0.0",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
     "@gnosis.pm/zodiac": "^3.0.0",

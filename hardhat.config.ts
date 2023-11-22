@@ -2,11 +2,12 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-gas-reporter";
 import "hardhat-deploy";
 
-import dotenv from "dotenv";
+import { config } from "dotenv";
 import { HardhatUserConfig, HttpNetworkUserConfig } from "hardhat/types";
 
-dotenv.config();
-const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY } = process.env;
+config();
+const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, GNOSISSCAN_API_KEY } =
+  process.env;
 const DEFAULT_MNEMONIC =
   "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
 
@@ -49,7 +50,7 @@ export default {
       ...sharedNetworkConfig,
       url: `https://sepolia.infura.io/v3/${INFURA_KEY}`,
     },
-    xdai: {
+    gnosis: {
       ...sharedNetworkConfig,
       url: "https://rpc.gnosischain.com/",
     },
@@ -59,7 +60,37 @@ export default {
     },
   },
   etherscan: {
-    apiKey: ETHERSCAN_API_KEY,
+    apiKey: {
+      mainnet: ETHERSCAN_API_KEY,
+      goerli: ETHERSCAN_API_KEY,
+      gnosis: GNOSISSCAN_API_KEY,
+    } as Record<string, string>,
+    customChains: [
+      {
+        network: "gnosis",
+        chainId: 100,
+        urls: {
+          apiURL: "https://api.gnosisscan.io/api",
+          browserURL: "https://www.gnosisscan.io",
+        },
+      },
+      {
+        network: "matic",
+        chainId: 137,
+        urls: {
+          apiURL: "https://api.polygonscan.com/api",
+          browserURL: "https://www.polygonscan.com",
+        },
+      },
+      {
+        network: "mumbai",
+        chainId: 80001,
+        urls: {
+          apiURL: "https://api-testnet.polygonscan.com/api",
+          browserURL: "https://mumbai.polygonscan.com",
+        },
+      },
+    ],
   },
   verify: {
     etherscan: {
