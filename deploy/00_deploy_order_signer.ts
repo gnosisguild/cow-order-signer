@@ -41,7 +41,7 @@ const deployOrderSigner: DeployFunction = async ({
   const gasPrice = await signer.getGasPrice();
   console.log(
     "account needs ETH (not all will be spent)",
-    formatEther(BigNumber.from("450000").mul(gasPrice)),
+    formatEther(BigNumber.from("550000").mul(gasPrice)),
     "at gas price: " + formatUnits(gasPrice, "gwei") + " gwei"
   );
 
@@ -55,7 +55,7 @@ const deployOrderSigner: DeployFunction = async ({
   await singletonFactory.deploy(
     OrderSigner.bytecode + initData.slice(2),
     defaultSalt,
-    { gasLimit: BigNumber.from("450000") }
+    { gasLimit: BigNumber.from("550000") }
   );
 
   console.log(
