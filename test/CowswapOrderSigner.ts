@@ -17,7 +17,7 @@ import {
   GPv2Signing,
   GPv2Signing__factory,
 } from "../typechain-types";
-import { keccak256, solidityKeccak256 } from "ethers/lib/utils";
+import { solidityKeccak256 } from "ethers/lib/utils";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { BigNumber, Contract } from "ethers";
 
@@ -64,7 +64,7 @@ describe("CowswapOrderSigner contract", () => {
       buyAmount: "474505929366652675891",
       validTo: now + 60 * 30,
       appData: solidityKeccak256(["string"], [appData]),
-      feeAmount: "5174075756534068",
+      feeAmount: "19174075756534068",
       kind: ethers.utils.id("sell"),
       partiallyFillable: false,
       sellTokenBalance: ethers.utils.id("erc20"),
@@ -97,96 +97,173 @@ describe("CowswapOrderSigner contract", () => {
     expect(bytecode).to.not.equal("0x");
   });
 
-  it("should compute the correct order UID and pre-sign it", async () => {
-    const {
-      orderSigner,
-      demoOrder,
-      demoOrderFeeAmountBP,
-      demoOrderValidDuration,
-      appData,
-      cowswap,
-      avatar,
-    } = await loadFixture(deployOrderSigner);
+  describe("signOrder", () => {
+    it("should compute the correct order UID and pre-sign it", async () => {
+      const {
+        orderSigner,
+        demoOrder,
+        demoOrderFeeAmountBP,
+        demoOrderValidDuration,
+        appData,
+        cowswap,
+        avatar,
+      } = await loadFixture(deployOrderSigner);
 
-    const cowApi = new OrderBookApi({ chainId: 1 });
+      const cowApi = new OrderBookApi({ chainId: 1 });
 
-    const expectedUid = await cowApi.sendOrder({
-      ...demoOrder,
-      kind: OrderKind.SELL,
-      sellTokenBalance: SellTokenSource.ERC20,
-      buyTokenBalance: BuyTokenDestination.ERC20,
-      from: avatar.address,
-      appData: appData,
-      appDataHash: demoOrder.appData,
-      signingScheme: SigningScheme.PRESIGN,
-      signature: "0x", // must be empty for presign
-    });
+      const expectedUid = await cowApi
+        .sendOrder({
+          ...demoOrder,
+          kind: OrderKind.SELL,
+          sellTokenBalance: SellTokenSource.ERC20,
+          buyTokenBalance: BuyTokenDestination.ERC20,
+          from: avatar.address,
+          appData: appData,
+          appDataHash: demoOrder.appData,
+          signingScheme: SigningScheme.PRESIGN,
+          signature: "0x", // must be empty for presign
+        })
+        .catch((e) => {
+          console.error(e);
+          throw e;
+        });
 
-    // order UID is not yet signed
-    expect(await cowswap.preSignature(expectedUid)).to.equal(0);
-
-    const { data } = await orderSigner.populateTransaction.signOrder(
-      demoOrder,
-      demoOrderValidDuration,
-      demoOrderFeeAmountBP
-    );
-
-    await expect(avatar.exec(orderSigner.address, 0, data || "", 1)).to.not.be
-      .reverted;
-
-    // now it is
-    expect(await cowswap.preSignature(expectedUid)).to.equal(
-      PRESIGNED_MAGIC_VALUE
-    );
-  });
-
-  it("should revert if not delegate called", async () => {
-    const {
-      orderSigner,
-      demoOrderFeeAmountBP,
-      demoOrderValidDuration,
-      avatar,
-      demoOrder,
-    } = await loadFixture(deployOrderSigner);
-
-    const { data } = await orderSigner.populateTransaction.signOrder(
-      demoOrder,
-      demoOrderValidDuration,
-      demoOrderFeeAmountBP
-    );
-
-    await expect(avatar.exec(orderSigner.address, 0, data || "", 0)).to.be
-      .reverted;
-  });
-
-  describe("bad orders", () => {
-    it("should revert if the order fee exceeds the declared fee basis points", async () => {
-      const { orderSigner, avatar, demoOrder, demoOrderValidDuration } =
-        await loadFixture(deployOrderSigner);
-
-      const feeAmountBP = 100; // was 535
+      // order UID is not yet signed
+      expect(await cowswap.preSignature(expectedUid)).to.equal(0);
 
       const { data } = await orderSigner.populateTransaction.signOrder(
         demoOrder,
         demoOrderValidDuration,
-        feeAmountBP
-      );
-
-      await expect(avatar.exec(orderSigner.address, 0, data || "", 1)).to.be
-        .reverted;
-    });
-
-    it("should revert if the validTo timestamp lies outside the declared valid duration from now", async () => {
-      const { orderSigner, avatar, demoOrder, demoOrderFeeAmountBP } =
-        await loadFixture(deployOrderSigner);
-
-      const { data } = await orderSigner.populateTransaction.signOrder(
-        demoOrder,
-        60, // set max allowed valid duration to 1 minute (the order exceeds this)
         demoOrderFeeAmountBP
       );
 
-      await expect(avatar.exec(orderSigner.address, 0, data || "", 1)).to.be
+      await expect(avatar.exec(orderSigner.address, 0, data || "", 1)).to.not.be
+        .reverted;
+
+      // now it is
+      expect(await cowswap.preSignature(expectedUid)).to.equal(
+        PRESIGNED_MAGIC_VALUE
+      );
+    });
+
+    it("should revert if not delegate called", async () => {
+      const {
+        orderSigner,
+        demoOrderFeeAmountBP,
+        demoOrderValidDuration,
+        avatar,
+        demoOrder,
+      } = await loadFixture(deployOrderSigner);
+
+      const { data } = await orderSigner.populateTransaction.signOrder(
+        demoOrder,
+        demoOrderValidDuration,
+        demoOrderFeeAmountBP
+      );
+
+      await expect(avatar.exec(orderSigner.address, 0, data || "", 0)).to.be
+        .reverted;
+    });
+
+    describe("bad orders", () => {
+      it("should revert if the order fee exceeds the declared fee basis points", async () => {
+        const { orderSigner, avatar, demoOrder, demoOrderValidDuration } =
+          await loadFixture(deployOrderSigner);
+
+        const feeAmountBP = 100; // was 535
+
+        const { data } = await orderSigner.populateTransaction.signOrder(
+          demoOrder,
+          demoOrderValidDuration,
+          feeAmountBP
+        );
+
+        await expect(avatar.exec(orderSigner.address, 0, data || "", 1)).to.be
+          .reverted;
+      });
+
+      it("should revert if the validTo timestamp lies outside the declared valid duration from now", async () => {
+        const { orderSigner, avatar, demoOrder, demoOrderFeeAmountBP } =
+          await loadFixture(deployOrderSigner);
+
+        const { data } = await orderSigner.populateTransaction.signOrder(
+          demoOrder,
+          60, // set max allowed valid duration to 1 minute (the order exceeds this)
+          demoOrderFeeAmountBP
+        );
+
+        await expect(avatar.exec(orderSigner.address, 0, data || "", 1)).to.be
+          .reverted;
+      });
+    });
+  });
+
+  describe("unsignOrder", () => {
+    it("should compute the correct order UID and revoke the pre-signature", async () => {
+      const {
+        orderSigner,
+        demoOrder,
+        demoOrderFeeAmountBP,
+        demoOrderValidDuration,
+        appData,
+        cowswap,
+        avatar,
+      } = await loadFixture(deployOrderSigner);
+
+      const cowApi = new OrderBookApi({ chainId: 1 });
+
+      // It's not possible to send multiple orders with the same UID, so we need to modify the order
+      const demoOrder2 = { ...demoOrder, validTo: demoOrder.validTo + 1 };
+
+      const expectedUid = await cowApi
+        .sendOrder({
+          ...demoOrder2,
+          kind: OrderKind.SELL,
+          sellTokenBalance: SellTokenSource.ERC20,
+          buyTokenBalance: BuyTokenDestination.ERC20,
+          from: avatar.address,
+          appData: appData,
+          appDataHash: demoOrder2.appData,
+          signingScheme: SigningScheme.PRESIGN,
+          signature: "0x", // must be empty for presign
+        })
+        .catch((e) => {
+          console.error(e);
+          throw e;
+        });
+
+      // sign the order
+      const { data: signData } =
+        await orderSigner.populateTransaction.signOrder(
+          demoOrder2,
+          demoOrderValidDuration,
+          demoOrderFeeAmountBP
+        );
+      await avatar.exec(orderSigner.address, 0, signData || "", 1);
+      expect(await cowswap.preSignature(expectedUid)).to.equal(
+        PRESIGNED_MAGIC_VALUE
+      );
+
+      // unsign the order
+      const { data: unsignData } =
+        await orderSigner.populateTransaction.unsignOrder(demoOrder2);
+      await expect(avatar.exec(orderSigner.address, 0, unsignData || "", 1)).to
+        .not.be.reverted;
+
+      // pre-signature has been cleared
+      expect(await cowswap.preSignature(expectedUid)).to.equal(0);
+    });
+
+    it("should revert if not delegate called", async () => {
+      const { orderSigner, avatar, demoOrder } = await loadFixture(
+        deployOrderSigner
+      );
+
+      const { data } = await orderSigner.populateTransaction.unsignOrder(
+        demoOrder
+      );
+
+      await expect(avatar.exec(orderSigner.address, 0, data || "", 0)).to.be
         .reverted;
     });
   });
