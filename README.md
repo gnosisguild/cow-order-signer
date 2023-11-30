@@ -6,6 +6,14 @@ In order to create [Roles Module](https://github.com/gnosis/zodiac-modifier-role
 
 - [Omniscia](https://omniscia.io/reports/gnosis-guild-cow-order-signer-654ca7b04ca7a30019c86b95/)
 
+## Deployments
+
+Address: `0x23dA9AdE38E4477b23770DeD512fD37b12381FAB`
+
+- [Ethereum](https://etherscan.io/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
+- [Gnosis](https://gnosisscan.io/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
+- [Goerli](https://goerli.etherscan.io/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
+
 ## How to Deploy
 
 Clone repo, run `yarn`, run `yarn deploy {network-name}` (networks defined in `./hardhat.config.ts`)
