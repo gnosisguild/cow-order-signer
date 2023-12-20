@@ -5,6 +5,7 @@ In order to create [Roles Module](https://github.com/gnosis/zodiac-modifier-role
 ## Audits
 
 - [Omniscia](https://omniscia.io/reports/gnosis-guild-cow-order-signer-654ca7b04ca7a30019c86b95/)
+- [G0 Group](https://github.com/g0-group/Audits/blob/master/CowswapOrderSignerDec2023.pdf)
 
 ## Deployments
 
