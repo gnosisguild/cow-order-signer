@@ -6,7 +6,7 @@ import { config } from "dotenv";
 import { HardhatUserConfig, HttpNetworkUserConfig } from "hardhat/types";
 
 config();
-const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, GNOSISSCAN_API_KEY } =
+const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, GNOSISSCAN_API_KEY, ARBISCAN_API_KEY } =
   process.env;
 const DEFAULT_MNEMONIC =
   "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
@@ -58,12 +58,17 @@ export default {
       ...sharedNetworkConfig,
       url: "https://rpc-mainnet.maticvigil.com",
     },
+    arbitrumOne: {
+      ...sharedNetworkConfig,
+      url: `https://arbitrum.llamarpc.com`,
+    },
   },
   etherscan: {
     apiKey: {
       mainnet: ETHERSCAN_API_KEY,
       goerli: ETHERSCAN_API_KEY,
       gnosis: GNOSISSCAN_API_KEY,
+      arbitrumOne: ARBISCAN_API_KEY,
     } as Record<string, string>,
     customChains: [
       {
@@ -90,11 +95,21 @@ export default {
           browserURL: "https://mumbai.polygonscan.com",
         },
       },
+      {
+        network: "arbitrumOne",
+        chainId: 42161,
+        urls: {
+          apiURL: "https://api.arbiscan.io/api",
+          browserURL: "https://arbiscan.io",
+        },
+      },
     ],
   },
   verify: {
     etherscan: {
-      apiKey: ETHERSCAN_API_KEY,
+      apiKey: {
+          arbitrumOne: ARBISCAN_API_KEY,
+      }
     },
   },
   gasReporter: {
