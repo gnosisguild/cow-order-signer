@@ -107,9 +107,7 @@ export default {
   },
   verify: {
     etherscan: {
-      apiKey: {
-          arbitrumOne: ARBISCAN_API_KEY,
-      }
+      apiKey: ETHERSCAN_API_KEY,
     },
   },
   gasReporter: {
