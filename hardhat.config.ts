@@ -6,8 +6,13 @@ import { config } from "dotenv";
 import { HardhatUserConfig, HttpNetworkUserConfig } from "hardhat/types";
 
 config();
-const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, GNOSISSCAN_API_KEY, ARBISCAN_API_KEY } =
-  process.env;
+const {
+  INFURA_KEY,
+  MNEMONIC,
+  ETHERSCAN_API_KEY,
+  GNOSISSCAN_API_KEY,
+  ARBISCAN_API_KEY,
+} = process.env;
 const DEFAULT_MNEMONIC =
   "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
 
@@ -67,6 +72,7 @@ export default {
     apiKey: {
       mainnet: ETHERSCAN_API_KEY,
       goerli: ETHERSCAN_API_KEY,
+      sepolia: ETHERSCAN_API_KEY,
       gnosis: GNOSISSCAN_API_KEY,
       arbitrumOne: ARBISCAN_API_KEY,
     } as Record<string, string>,
