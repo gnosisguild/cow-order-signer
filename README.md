@@ -14,7 +14,7 @@ Address: `0x23dA9AdE38E4477b23770DeD512fD37b12381FAB`
 - [Ethereum](https://etherscan.io/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
 - [Gnosis](https://gnosisscan.io/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
 - [Arbitrum](https://arbiscan.io/address/0x23da9ade38e4477b23770ded512fd37b12381fab)
-- [Goerli](https://goerli.etherscan.io/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
+- [Sepolia](https://sepolia.etherscan.io/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
 
 ## How to Deploy
 
