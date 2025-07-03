@@ -14,11 +14,17 @@ Address: `0x23dA9AdE38E4477b23770DeD512fD37b12381FAB`
 - [Ethereum](https://etherscan.io/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
 - [Gnosis](https://gnosisscan.io/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
 - [Arbitrum](https://arbiscan.io/address/0x23da9ade38e4477b23770ded512fd37b12381fab)
+- [Avalanche](https://snowtrace.io/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
+- [Polygon](https://polygonscan.com/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
 - [Sepolia](https://sepolia.etherscan.io/address/0x23dA9AdE38E4477b23770DeD512fD37b12381FAB)
 
 ## How to Deploy
 
 Clone repo, run `yarn`, run `yarn deploy {network-name}` (networks defined in `./hardhat.config.ts`)
+
+Rerun a second time to verify.
+
+When using Frame, make sure you hardcode the `from` wallet address and adjust the gasLimit manually in Frame.
 
 ## How to Test
 

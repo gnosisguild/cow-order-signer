@@ -6,13 +6,7 @@ import { config } from "dotenv";
 import { HardhatUserConfig, HttpNetworkUserConfig } from "hardhat/types";
 
 config();
-const {
-  INFURA_KEY,
-  MNEMONIC,
-  ETHERSCAN_API_KEY,
-  GNOSISSCAN_API_KEY,
-  ARBISCAN_API_KEY,
-} = process.env;
+const { INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY } = process.env;
 const DEFAULT_MNEMONIC =
   "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
 
@@ -47,10 +41,6 @@ export default {
       ...sharedNetworkConfig,
       url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
     },
-    goerli: {
-      ...sharedNetworkConfig,
-      url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
-    },
     sepolia: {
       ...sharedNetworkConfig,
       url: `https://sepolia.infura.io/v3/${INFURA_KEY}`,
@@ -59,23 +49,27 @@ export default {
       ...sharedNetworkConfig,
       url: "https://rpc.gnosischain.com/",
     },
-    matic: {
-      ...sharedNetworkConfig,
-      url: "https://rpc-mainnet.maticvigil.com",
-    },
     arbitrumOne: {
       ...sharedNetworkConfig,
       url: `https://arbitrum.llamarpc.com`,
     },
+    base: {
+      ...sharedNetworkConfig,
+      url: `https://base.llamarpc.com`,
+    },
+    avalanche: {
+      ...sharedNetworkConfig,
+      chainId: 43114,
+      url: "https://avalanche-c-chain-rpc.publicnode.com",
+    },
+    polygon: {
+      ...sharedNetworkConfig,
+      chainId: 137,
+      url: "https://polygon-rpc.com",
+    },
   },
   etherscan: {
-    apiKey: {
-      mainnet: ETHERSCAN_API_KEY,
-      goerli: ETHERSCAN_API_KEY,
-      sepolia: ETHERSCAN_API_KEY,
-      gnosis: GNOSISSCAN_API_KEY,
-      arbitrumOne: ARBISCAN_API_KEY,
-    } as Record<string, string>,
+    apiKey: ETHERSCAN_API_KEY,
     customChains: [
       {
         network: "gnosis",
@@ -107,6 +101,30 @@ export default {
         urls: {
           apiURL: "https://api.arbiscan.io/api",
           browserURL: "https://arbiscan.io",
+        },
+      },
+      {
+        network: "base",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org",
+        },
+      },
+      {
+        network: "avalanche",
+        chainId: 43114,
+        urls: {
+          apiURL: "https://api.snowtrace.io/api",
+          browserURL: "https://snowtrace.io",
+        },
+      },
+      {
+        network: "polygon",
+        chainId: 137,
+        urls: {
+          apiURL: "https://api.polygonscan.com/api",
+          browserURL: "https://polygonscan.com",
         },
       },
     ],
