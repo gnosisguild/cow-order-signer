@@ -57,6 +57,16 @@ export default {
       ...sharedNetworkConfig,
       url: `https://base.llamarpc.com`,
     },
+    avalanche: {
+      ...sharedNetworkConfig,
+      chainId: 43114,
+      url: "https://avalanche-c-chain-rpc.publicnode.com",
+    },
+    polygon: {
+      ...sharedNetworkConfig,
+      chainId: 137,
+      url: "https://polygon-rpc.com",
+    },
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
@@ -99,6 +109,22 @@ export default {
         urls: {
           apiURL: "https://api.basescan.org/api",
           browserURL: "https://basescan.org",
+        },
+      },
+      {
+        network: "avalanche",
+        chainId: 43114,
+        urls: {
+          apiURL: "https://api.snowtrace.io/api",
+          browserURL: "https://snowtrace.io",
+        },
+      },
+      {
+        network: "polygon",
+        chainId: 137,
+        urls: {
+          apiURL: "https://api.polygonscan.com/api",
+          browserURL: "https://polygonscan.com",
         },
       },
     ],

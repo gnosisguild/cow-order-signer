@@ -1,5 +1,4 @@
 import { defaultAbiCoder } from "@ethersproject/abi";
-import ethProvider from "eth-provider";
 import { DeployFunction } from "hardhat-deploy/types";
 import {
   formatEther,
@@ -12,6 +11,8 @@ import { getSingletonFactory } from "@gnosis.pm/zodiac/dist/src/factory/singleto
 import { BigNumber } from "ethers";
 import { Web3Provider } from "@ethersproject/providers";
 import { EthereumProvider, HardhatRuntimeEnvironment } from "hardhat/types";
+
+const ethProvider = require("eth-provider");
 
 function createEIP1193(
   chainId: number | undefined,
@@ -39,6 +40,7 @@ const requestUsingFrame = async (
   // fix for "Transaction parameter 'gasLimit' is not a valid hex string" RPC error
   if (Array.isArray(params) && typeof params[0].gasLimit === "number") {
     params[0].gasLimit = "0x" + params[0].gasLimit.toString(16);
+    console.log("params[0].gasLimit", params[0].gasLimit);
   }
   return frame.request({ method, params });
 };
@@ -99,10 +101,12 @@ const deployOrderSigner: DeployFunction = async ({
   );
 
   // Send transaction via Frame
+  const from = "TODO";
+  console.log("deploy from:", from);
   const txHash = await requestUsingFrame(chainId, "eth_sendTransaction", [
     {
       ...deployTx,
-      from: signer.address,
+      from,
     },
   ]);
 
